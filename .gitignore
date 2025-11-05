@@ -82,7 +82,9 @@ dist
 
 # Gatsby files
 .cache/
-public
+public/*
+!public/dashboard.html
+!public/dashboard.js
 
 # Storybook build outputs
 .out

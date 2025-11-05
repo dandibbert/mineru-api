@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MinerU 配置面板</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 60px;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 0.02em;
+            color: #f8fafc;
+        }
+
+        p.description {
+            margin: 0;
+            color: #cbd5f5;
+            max-width: 620px;
+            line-height: 1.6;
+        }
+
+        .panel {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.35);
+            backdrop-filter: blur(12px);
+        }
+
+        .status {
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            background: rgba(34, 197, 94, 0.15);
+            color: #bbf7d0;
+        }
+
+        .status.error {
+            display: block;
+            border: 1px solid rgba(248, 113, 113, 0.4);
+            background: rgba(248, 113, 113, 0.15);
+            color: #fecaca;
+        }
+
+        .status.info {
+            display: block;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            background: rgba(59, 130, 246, 0.2);
+            color: #bfdbfe;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 420px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            background: rgba(15, 23, 42, 0.9);
+            color: #e2e8f0;
+            padding: 16px;
+            font-family: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(94, 234, 212, 0.8);
+            box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.25);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        button {
+            appearance: none;
+            border: none;
+            border-radius: 999px;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.01em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: #f8fafc;
+            box-shadow: 0 15px 25px rgba(14, 165, 233, 0.35);
+        }
+
+        button.secondary {
+            background: rgba(148, 163, 184, 0.15);
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        footer {
+            margin-top: 32px;
+            font-size: 0.85rem;
+            color: rgba(226, 232, 240, 0.65);
+            text-align: center;
+        }
+
+        code {
+            background: rgba(148, 163, 184, 0.15);
+            border-radius: 6px;
+            padding: 2px 6px;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 24px 16px 48px;
+            }
+
+            textarea {
+                min-height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MinerU 配置面板</h1>
+            <p class="description">
+                通过这个页面可以直接查看和编辑 <code>config.json</code>，保存后会立即触发热重载。
+                编辑时请保持合法的 JSON 格式。
+            </p>
+        </header>
+        <div class="panel">
+            <div id="status" class="status info">正在加载配置...</div>
+            <form id="config-form">
+                <label for="config-editor" style="display:block;margin-bottom:12px;font-weight:600;color:#cbd5f5;">
+                    配置内容
+                </label>
+                <textarea id="config-editor" spellcheck="false" placeholder="{\n  \"mineru\": { ... }\n}"></textarea>
+                <div class="actions">
+                    <button type="button" class="secondary" id="format-btn">自动格式化</button>
+                    <button type="submit" class="primary">保存并热重载</button>
+                </div>
+            </form>
+        </div>
+        <footer>
+            当前页面默认展示 <code>config.json</code>；若文件不存在，将使用 <code>config.example.json</code> 作为初始模板。
+        </footer>
+    </div>
+    <script src="/static/dashboard.js" defer></script>
+</body>
+</html>

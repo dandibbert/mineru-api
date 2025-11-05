@@ -11,12 +11,14 @@ const fs = require('fs');
 
 // 导入路由
 const convertRouter = require('./routes/convert');
+const configRouter = require('./routes/config');
 
 // 导入工具
 const logger = require('./utils/logger');
 
 const app = express();
 const PORT = process.env.PORT || 8000;
+const PUBLIC_DIR = path.join(__dirname, 'public');
 
 // 创建必要的目录
 const TEMP_DIR = path.join(__dirname, 'temp');
@@ -85,7 +87,20 @@ app.get('/health', (req, res) => {
     });
 });
 
+// 静态资源与仪表盘
+if (fs.existsSync(PUBLIC_DIR)) {
+    app.use('/static', express.static(PUBLIC_DIR));
+}
+
+app.get('/dashboard', (req, res, next) => {
+    if (!fs.existsSync(path.join(PUBLIC_DIR, 'dashboard.html'))) {
+        return next();
+    }
+    res.sendFile(path.join(PUBLIC_DIR, 'dashboard.html'));
+});
+
 // API 路由
+app.use('/api/config', configRouter);
 app.use('/api', convertRouter);
 
 // 根路径
